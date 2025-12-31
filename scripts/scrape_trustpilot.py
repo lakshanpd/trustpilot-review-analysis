@@ -7,7 +7,9 @@ def scrape_url(url):
         return None
     return res.content
 
-def filter_reviews(content):
+def extract_reviews_from_page(url):
+    content = scrape_url(url)
+    
     soup = BeautifulSoup(content, "html.parser")
     cards = soup.select("div[data-testid='service-review-card-v2']")
     results = []
@@ -38,7 +40,24 @@ def filter_reviews(content):
 
     return results
 
+def scrape_reviews_across_pages(base_url, max_pages=50):
+    all_reviews = []
+    page = 1
+
+    while page <= max_pages:
+        url = f"{base_url}?page={page}" if page > 1 else base_url
+
+        reviews = extract_reviews_from_page(url)
+
+        if not reviews:
+            break
+
+        all_reviews.extend(reviews)
+        page += 1
+
+    return all_reviews
+
+
 if __name__ == "__main__":
-    content = scrape_url("https://www.trustpilot.com/review/taskrabbit.it?page=10")
-    res = filter_reviews(content)
+    res = scrape_reviews_across_pages("https://www.trustpilot.com/review/taskrabbit.it")
     print(len(res))
