@@ -1,3 +1,9 @@
 requests
 beautifulsoup4
 dotenv
+notebook
+pandas 
+matplotlib
+deep-translator
+ipykernel
+langdetect
