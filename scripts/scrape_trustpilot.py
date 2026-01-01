@@ -1,5 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
+import csv
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+TRUSTPILOT_URL = os.getenv("TRUSTPILOT_URL")
 
 def scrape_url(url):
     res = requests.get(url)
@@ -57,7 +64,28 @@ def scrape_reviews_across_pages(base_url, max_pages=50):
 
     return all_reviews
 
+def save_reviews_to_csv(
+    reviews,
+    filename,
+    base_dir="data/trustpilot"
+):
+    if not reviews:
+        print("No reviews to save.")
+        return
+
+    os.makedirs(base_dir, exist_ok=True)
+    filepath = os.path.join(base_dir, filename)
+
+    fieldnames = ["reviewer", "date", "text", "stars"]
+
+    with open(filepath, mode="w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(reviews)
+
+    print(f"Saved {len(reviews)} reviews to {filepath}")
+
 
 if __name__ == "__main__":
-    res = scrape_reviews_across_pages("https://www.trustpilot.com/review/taskrabbit.it")
-    print(len(res))
+    reviews = scrape_reviews_across_pages(TRUSTPILOT_URL)
+    save_reviews_to_csv(reviews=reviews, filename="task_rabbit.csv")
