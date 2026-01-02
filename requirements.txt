@@ -7,3 +7,6 @@ matplotlib
 deep-translator
 ipykernel
 langdetect
+vaderSentiment
+transformers 
+torch
