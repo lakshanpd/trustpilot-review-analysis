@@ -24,7 +24,25 @@ def sentiment_analysis(data_path):
     if missing:
         raise ValueError(f"Invalid data structure. Missing columns: {missing}")
 
-    print("sentiment analysis is started...\n")
+    df[["sentiment", "sentiment_confidence"]] = df["text_en"].apply(
+        lambda x: pd.Series(classify_sentiment(x))
+    )
+
+    label_map = {
+        "LABEL_0": "negative",
+        "LABEL_1": "neutral",
+        "LABEL_2": "positive"
+    }
+    df["sentiment"] = df["sentiment"].map(label_map)
+
+    return df
+
+def sentiment_analysis_df(df):
+    # schema check
+    required_columns = {"text_en"}
+    missing = required_columns - set(df.columns)
+    if missing:
+        raise ValueError(f"Invalid data structure. Missing columns: {missing}")
 
     df[["sentiment", "sentiment_confidence"]] = df["text_en"].apply(
         lambda x: pd.Series(classify_sentiment(x))
@@ -37,7 +55,6 @@ def sentiment_analysis(data_path):
     }
     df["sentiment"] = df["sentiment"].map(label_map)
 
-    print("sentiment analysis is finished...")
     return df
 
 def run_sentiment_and_save(src_path, dest_path):
@@ -46,11 +63,4 @@ def run_sentiment_and_save(src_path, dest_path):
     os.makedirs(os.path.dirname(dest_path), exist_ok=True)
     df_sentiment.to_csv(dest_path, index=False)
 
-    print(f"sentiment results saved to: {dest_path}\n")
     return df_sentiment
-
-if __name__ == "__main__":
-    SRC = "/Users/danukalakshan/Projects/review-analysis/data/trustpilot/task_rabbit_preprocessed.csv"
-    DEST = "/Users/danukalakshan/Projects/review-analysis/data/trustpilot/task_rabbit_analysed.csv"
-
-    run_sentiment_and_save(SRC, DEST)

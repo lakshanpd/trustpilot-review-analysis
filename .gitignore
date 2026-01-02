@@ -3,3 +3,5 @@
 
 # Data outputs (scraped files, CSVs, etc.)
 data/
+
+__pycache__/
